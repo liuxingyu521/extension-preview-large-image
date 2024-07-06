@@ -12,7 +12,8 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "release": "npx bumpp --tag --commit --push"
   },
   "devDependencies": {
     "typescript": "^5.5.2",
