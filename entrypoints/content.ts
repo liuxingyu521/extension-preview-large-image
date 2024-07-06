@@ -2,7 +2,7 @@ import '@/assets/image-viewer.min.css'
 import '@/assets/image-viewer.min.js'
 
 export default defineContentScript({
-  matches: ['*://*/'],
+  matches: ['<all_urls>'],
   main() {
     browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       if (message.url) {
