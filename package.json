@@ -2,7 +2,7 @@
   "name": "preview-image-large",
   "description": "Right-click to view image in full size",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "dev": "wxt",
