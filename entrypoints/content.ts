@@ -14,7 +14,7 @@ export default defineContentScript({
           navbar: false,
           title: false,
           fullscreen: false,
-          toolbar: false,
+          toolbar: true,
           tooltip: false,
           loop: false,
         });
@@ -22,26 +22,18 @@ export default defineContentScript({
       }
     });
 
-    document.addEventListener('contextmenu', async (event) => {
-      // 获取点击位置路径上的所有元素
-      const allElementsAtCurPoint = document.elementsFromPoint(event.pageX, event.pageY);
-      // 找到有 src 属性的图片元素
+    document.addEventListener('contextmenu', (event) => {
+      const allElementsAtCurPoint = document.elementsFromPoint(event.clientX, event.clientY);
       const targetImg = allElementsAtCurPoint.find(item => item.tagName === 'IMG' && item.getAttribute('src'))
 
-      if(!targetImg) {
+      if (targetImg) {
+        const targetImgUrl = targetImg.getAttribute('src');
+
         browser.runtime.sendMessage({
-          type: 'HIDE_PREVIEW_LARGE_IMG'
-        })
-        return;
+          type: 'SET_IMAGE_URL',
+          url: targetImgUrl
+        });
       }
-
-      const targetImgUrl = targetImg.getAttribute('src');
-
-      // 注册右键菜单
-      browser.runtime.sendMessage({
-        type: 'RIGHT_CLICK_IMAGE',
-        url: targetImgUrl
-      });
     });
   },
 });
