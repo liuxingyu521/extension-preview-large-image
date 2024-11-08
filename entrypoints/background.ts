@@ -1,10 +1,12 @@
+import { i18n } from '#i18n';
+
 export default defineBackground(() => {
   let currentImageUrl: string | null = null;
 
   browser.runtime.onInstalled.addListener(() => {
     browser.contextMenus.create({
       id: "viewImage",
-      title: "查看大图（图片有效）",
+      title: i18n.t('menuTitle'),
       contexts: ['all']
     });
 
