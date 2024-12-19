@@ -1,7 +1,7 @@
 import { i18n } from '#i18n';
 
 export default defineBackground(() => {
-  let currentImageUrl: string | null = null;
+  let currentImageUrls: string[] | null = null;
 
   browser.runtime.onInstalled.addListener(() => {
     browser.contextMenus.create({
@@ -14,15 +14,15 @@ export default defineBackground(() => {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "viewImage" && tab?.id) {
-      browser.tabs.sendMessage(tab.id, { type: 'PREVIEW_IMG', url: currentImageUrl });
-      currentImageUrl = null;
+      browser.tabs.sendMessage(tab.id, { type: 'PREVIEW_IMG', urls: currentImageUrls });
+      currentImageUrls= null;
     }
   });
 
   // 监听来自 content script 的消息
   browser.runtime.onMessage.addListener((message) => {
-    if (message.type === 'SET_IMAGE_URL') {
-      currentImageUrl = message.url;
+    if (message.type === 'SET_IMAGE_URLS') {
+      currentImageUrls = message.urls;
     }
   });
 });
