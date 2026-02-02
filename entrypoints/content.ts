@@ -34,8 +34,24 @@ export default defineContentScript({
     document.addEventListener('contextmenu', (event) => {
       const allElementsAtCurPoint = document.elementsFromPoint(event.clientX, event.clientY);
       const targetImgList = allElementsAtCurPoint.map((item, index) => {
+        // 解析 picture 元素
+        if (item.tagName === 'PICTURE') {
+          const sourceDom = item.querySelector('source');
+          if (sourceDom) {
+            const sourceUrl = sourceDom.getAttribute('srcset')?.split(',')[0]?.split(' ')[0] || '';
+            if (sourceUrl) {
+              return sourceUrl;
+            }
+          }
+        }
+
         // 图片元素
-        if (item.tagName === 'IMG' && item.getAttribute('src')) {
+        // 只在其祖先中没有 picture 元素时，处理 img 元素
+        if (
+          item.tagName === 'IMG' &&
+          item.getAttribute('src') &&
+          !item.closest('picture')
+        ) {
           const imgUrl = item.getAttribute('src');
           return imgUrl;
         }
