@@ -39,4 +39,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          asset_paths: '["./output/*.zip"]'
+          asset_paths: '[".output/*.zip"]'
