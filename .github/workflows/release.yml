@@ -38,3 +38,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           asset_paths: '["./output/*.zip"]'
+        permissions:
+          contents: write
+          packages: write
