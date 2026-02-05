@@ -25,6 +25,7 @@ export default defineContentScript({
           toolbar: true,
           tooltip: false,
           loop: false,
+          zIndex: 10000,
         });
 
         viewer.show();
@@ -34,26 +35,17 @@ export default defineContentScript({
     document.addEventListener('contextmenu', (event) => {
       const allElementsAtCurPoint = document.elementsFromPoint(event.clientX, event.clientY);
       const targetImgList = allElementsAtCurPoint.map((item, index) => {
-        // 解析 picture 元素
-        if (item.tagName === 'PICTURE') {
-          const sourceDom = item.querySelector('source');
-          if (sourceDom) {
-            const sourceUrl = sourceDom.getAttribute('srcset')?.split(',')[0]?.split(' ')[0] || '';
-            if (sourceUrl) {
-              return sourceUrl;
-            }
-          }
-        }
-
         // 图片元素
-        // 只在其祖先中没有 picture 元素时，处理 img 元素
+        // 如果是 picture 内部的 img 元素，返回 currentSrc
         if (
-          item.tagName === 'IMG' &&
-          item.getAttribute('src') &&
-          !item.closest('picture')
+          item.tagName === 'IMG'
         ) {
-          const imgUrl = item.getAttribute('src');
-          return imgUrl;
+          const isChildOfPicture = item.closest('picture') !== null;
+          if (isChildOfPicture) {
+            return (item as HTMLImageElement).currentSrc;
+          }
+
+          return item.getAttribute('src');
         }
 
         // 背景图
