@@ -4,12 +4,13 @@ import '@/assets/image-viewer.min.js'
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
-    browser.runtime.onMessage.addListener(async (message) => {
-      if (message.type === 'PREVIEW_IMG' && message.urls) {
+    browser.runtime.onMessage.addListener(async (message: unknown) => {
+      const msg = message as { type: string; urls?: string[] };
+      if (msg.type === 'PREVIEW_IMG' && msg.urls) {
         const containerDom = document.createElement('div')
         const fragment = document.createDocumentFragment();
 
-        message.urls.forEach((url: string) => {
+        msg.urls.forEach((url: string) => {
           const imageDom = document.createElement('img');
           imageDom.src = url;
           fragment.appendChild(imageDom);
