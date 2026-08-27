@@ -35,6 +35,15 @@ When I browse some websites, there the interaction with the picture is not very 
 
 just right click the image element,then select the `preview the large image`
 
+
+## 🖼️ Image / Video Takeover
+
+When you visit an image or video URL directly and the server responds with `Content-Disposition: attachment`, the extension redirects you to a built-in viewer page where you can preview and download the file.
+
+- Normal, directly-previewable images and videos keep the browser's native preview.
+- The takeover can be enabled/disabled separately for images and videos in the extension popup.
+- Works in both Chrome and Firefox.
+
 ## ⛏️ Built Using
 
 - [Wxt](https://wxt.dev/) - the extension framework

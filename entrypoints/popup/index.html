@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview Large Image</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        margin: 0;
+        padding: 12px 16px;
+        min-width: 190px;
+        color: #1f2328;
+      }
+      h1 {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 10px;
+        color: #59636e;
+      }
+      label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        cursor: pointer;
+      }
+      input[type='checkbox'] {
+        accent-color: #0969da;
+        width: 16px;
+        height: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="title"></h1>
+    <label>
+      <input type="checkbox" id="image-toggle" />
+      <span id="image-label"></span>
+    </label>
+    <label>
+      <input type="checkbox" id="video-toggle" />
+      <span id="video-label"></span>
+    </label>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
