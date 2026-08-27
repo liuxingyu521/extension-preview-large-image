@@ -1,5 +1,5 @@
 <p align="center">
- <img src="./public/icon/96.png" alt="Project logo">
+  <img src="./public/icon/96.png" alt="项目 Logo">
 </p>
 
 <h3 align="center">preview-large-image</h3>
@@ -11,46 +11,55 @@
 
 </div>
 
+<div align="center">
+
+[English](./README.en.md) | 简体中文
+
+</div>
+
 ---
 
 <p align="center">
-  a browser extension to preview large image
+  一个用于预览大图的浏览器扩展
 </p>
 
 ![extension-preview-large-image-demo](./demo.gif)
 
-## 🧐 motivation
+## 🧐 动机
 
-When I browse some websites, there the interaction with the picture is not very consistent, some have the function of providing a quick view of the big picture, some are fixed size picture layout, can not directly view the actual size of picture. It's annoyed to me.
+浏览一些网站时，图片的交互体验并不一致：有的网站提供快速查看大图的功能，有的则使用固定尺寸的图片布局，无法直接查看图片的实际大小，这让我感到困扰。
 
-## 🔧 Install
+## 🔧 安装
 
-- go [release](https://github.com/liuxingyu521/extension-preview-large-image/releases) page, and download the `zip` file in Assets area, then decompress the file.
+- 前往 [release](https://github.com/liuxingyu521/extension-preview-large-image/releases) 页面，在 Assets 区域下载 `zip` 文件并解压。
 
-- Open the Chrome browser and go to `chrome://extensions/`, and enable Developer Mode.
+- 打开 Chrome 浏览器，进入 `chrome://extensions/`，并开启开发者模式。
 
-- Click the `Load unzipped extensions` button and select the folder you just extracted
+- 点击「加载已解压的扩展程序」按钮，选择刚刚解压的文件夹。
 
-## 🎈 Usage
+## 🎈 使用
 
-just right click the image element,then select the `preview the large image`
+右键点击图片元素，选择「预览大图」即可。
 
+## 🖼️ 图片 / 视频接管
 
-## 🖼️ Image / Video Takeover
+### 动机
 
-When you visit an image or video URL directly and the server responds with `Content-Disposition: attachment`, the extension redirects you to a built-in viewer page where you can preview and download the file.
+想直接预览图片或视频时，如果响应头带有 `Content-Disposition: attachment`，浏览器会直接下载到本地而非预览，这很困扰我。
 
-- Normal, directly-previewable images and videos keep the browser's native preview.
-- The takeover can be enabled/disabled separately for images and videos in the extension popup.
-- Works in both Chrome and Firefox.
+当你直接访问图片或视频 URL，且服务器返回 `Content-Disposition: attachment` 时，扩展会将你重定向到内置的预览页面，以便预览和下载该文件。
 
-## ⛏️ Built Using
+- 正常的、可直接预览的图片和视频仍保持浏览器原生预览。
+- 可在扩展弹窗中分别开启或关闭图片与视频的接管。
+- 同时支持 Chrome 和 Firefox。
 
-- [Wxt](https://wxt.dev/) - the extension framework
-- [viewerjs](https://github.com/fengyuanchen/viewerjs) - preview image tool
+## ⛏️ 技术栈
 
-## ✍️ Authors
+- [Wxt](https://wxt.dev/) - 扩展开发框架
+- [viewerjs](https://github.com/fengyuanchen/viewerjs) - 图片预览工具
 
-- [@liuxingyu521](https://github.com/liuxingyu521) - Idea & Initial work
+## ✍️ 作者
 
-See also the list of [contributors](https://github.com/liuxingyu521/extension-preview-large-image/contributors) who participated in this project.
+- [@liuxingyu521](https://github.com/liuxingyu521) - 想法与初始开发
+
+另见参与此项目的[贡献者](https://github.com/liuxingyu521/extension-preview-large-image/contributors)列表。
