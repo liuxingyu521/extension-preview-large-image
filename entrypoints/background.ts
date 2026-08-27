@@ -65,6 +65,9 @@ export default defineBackground(() => {
   if (import.meta.env.FIREFOX) {
     browser.webRequest.onHeadersReceived.addListener(
       (details) => {
+        // 仅接管浏览器发起的导航（地址栏输入）。网页内点击链接/脚本导航会带上
+        // originUrl（来源页面），此时放行，交给网站自己的下载逻辑。
+        if (details.originUrl) return {};
         const kind = detectTakeoverKind(details.responseHeaders);
         if (!kind) return {};
         const enabled = kind === 'image' ? config.imageTakeover : config.videoTakeover;
@@ -86,6 +89,9 @@ export default defineBackground(() => {
     browser.webRequest.onHeadersReceived.addListener(
       (details) => {
         if (details.tabId < 0) return;
+        // 仅接管浏览器发起的导航（地址栏输入）。网页内点击链接/脚本导航会带上
+        // initiator（来源页面），此时放行，交给网站自己的下载逻辑。
+        if (details.initiator) return;
         const kind = detectTakeoverKind(details.responseHeaders);
         if (!kind) return;
         const enabled = kind === 'image' ? config.imageTakeover : config.videoTakeover;
