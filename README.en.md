@@ -39,7 +39,7 @@ When browsing some websites, the interaction with images is not very consistent:
 
 ## 🎈 Usage
 
-Just right-click the image element, then select `preview the large image`.
+Just right-click an image or inline SVG element, then select `preview the large image`.
 
 ## 🖼️ Image / Video Takeover
 

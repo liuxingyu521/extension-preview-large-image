@@ -1,6 +1,80 @@
 import '@/assets/image-viewer.min.css'
 import '@/assets/image-viewer.min.js'
 
+// 内联 SVG 序列化为独立 data URL。逐节点内联计算样式，
+// 保证脱离页面样式表 / currentColor 后预览仍与页面一致。
+const SVG_INLINE_PROPERTIES = [
+  'color',
+  'fill',
+  'fill-opacity',
+  'fill-rule',
+  'stroke',
+  'stroke-opacity',
+  'stroke-width',
+  'stroke-linecap',
+  'stroke-linejoin',
+  'stroke-miterlimit',
+  'stroke-dasharray',
+  'stroke-dashoffset',
+  'opacity',
+  'visibility',
+  'display',
+  'stop-color',
+  'stop-opacity',
+  'font-family',
+  'font-size',
+  'font-style',
+  'font-weight',
+  'font-stretch',
+  'font-variant',
+  'letter-spacing',
+  'word-spacing',
+  'text-anchor',
+  'dominant-baseline',
+  'text-rendering',
+  'transform',
+  'transform-origin',
+  'transform-box',
+] as const;
+
+function serializeSvgToDataUrl(svg: SVGSVGElement): string | null {
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+
+  // 用渲染后的实际尺寸，避免无 width/height 的 svg 塌缩成默认尺寸。
+  const rect = svg.getBoundingClientRect();
+  if (rect.width > 0 && rect.height > 0) {
+    clone.setAttribute('width', String(rect.width));
+    clone.setAttribute('height', String(rect.height));
+  }
+
+  // XMLSerializer 通常会补 xmlns，这里显式兜底，确保作为 image/svg+xml 可渲染。
+  if (!clone.hasAttribute('xmlns')) {
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  }
+
+  const applyStyles = (source: Element, target: Element) => {
+    const computed = getComputedStyle(source);
+    const declarations: string[] = [];
+    for (const prop of SVG_INLINE_PROPERTIES) {
+      const value = computed.getPropertyValue(prop);
+      if (value) declarations.push(`${prop}: ${value}`);
+    }
+    if (declarations.length > 0) {
+      target.setAttribute('style', declarations.join('; '));
+    }
+
+    const sourceChildren = source.children;
+    const targetChildren = target.children;
+    for (let i = 0; i < sourceChildren.length; i++) {
+      applyStyles(sourceChildren[i], targetChildren[i]);
+    }
+  };
+  applyStyles(svg, clone);
+
+  const xml = new XMLSerializer().serializeToString(clone);
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+}
+
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
@@ -35,39 +109,54 @@ export default defineContentScript({
 
     document.addEventListener('contextmenu', (event) => {
       const allElementsAtCurPoint = document.elementsFromPoint(event.clientX, event.clientY);
-      const targetImgList = allElementsAtCurPoint.map((item, index) => {
-        // 图片元素
-        // 如果是 picture 内部的 img 元素，返回 currentSrc
-        if (
-          item.tagName === 'IMG'
-        ) {
-          const isChildOfPicture = item.closest('picture') !== null;
-          if (isChildOfPicture) {
-            return (item as HTMLImageElement).currentSrc;
-          }
+      const targetImgList = Array.from(
+        new Set(
+          allElementsAtCurPoint
+            .map((item, index) => {
+              // 图片元素
+              // 如果是 picture 内部的 img 元素，返回 currentSrc
+              if (item.tagName === 'IMG') {
+                const isChildOfPicture = item.closest('picture') !== null;
+                if (isChildOfPicture) {
+                  return (item as HTMLImageElement).currentSrc;
+                }
 
-          return item.getAttribute('src');
-        }
+                return item.getAttribute('src');
+              }
 
-        // 背景图
-        let bgImageUrl = item.computedStyleMap().get('background-image')?.toString() || '';
-        bgImageUrl = bgImageUrl.match(/url\("(.*)"\)$/)?.[1] || '';
+              // 内联 SVG：序列化为 data URL 以便预览
+              const svgDom = item.closest('svg');
+              if (svgDom) {
+                return serializeSvgToDataUrl(svgDom);
+              }
 
-        if (bgImageUrl) {
-          return bgImageUrl;
-        }
+              // 背景图
+              let bgImageUrl = item.computedStyleMap().get('background-image')?.toString() || '';
+              bgImageUrl = bgImageUrl.match(/url\("(.*)"\)$/)?.[1] || '';
 
-        // 如果最上层元素是图片且设置了 pointer-events: none; 
-        // 无法直接捕获到，只会捕获到其下层元素
-        if (index === 0) {
-          const imgDom = item.querySelector('img');
-          const imgUrl = imgDom?.getAttribute('src');
+              if (bgImageUrl) {
+                return bgImageUrl;
+              }
 
-          if (imgUrl) {
-            return imgUrl;
-          }
-        }
-      }).filter(Boolean);
+              // 如果最上层元素是图片且设置了 pointer-events: none;
+              // 无法直接捕获到，只会捕获到其下层元素
+              if (index === 0) {
+                const imgDom = item.querySelector('img');
+                const imgUrl = imgDom?.getAttribute('src');
+
+                if (imgUrl) {
+                  return imgUrl;
+                }
+
+                const svgDom = item.querySelector('svg');
+                if (svgDom) {
+                  return serializeSvgToDataUrl(svgDom);
+                }
+              }
+            })
+            .filter((url): url is string => Boolean(url)),
+        ),
+      );
 
       if (targetImgList.length > 0) {
         browser.runtime.sendMessage({
