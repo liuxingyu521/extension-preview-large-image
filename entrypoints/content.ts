@@ -78,6 +78,14 @@ function serializeSvgToDataUrl(svg: SVGSVGElement): string | null {
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
+    // Viewer.js 打开预览时给 body 加 .viewer-open { overflow: hidden } 滚动锁。
+    // 部分虚拟化列表站点上，body 的 overflow 切到 hidden 会让可滚动区域塌缩、
+    // 滚动位置被重置到顶部（scrollTop 直接归零，且锁定期间无法再设回）。
+    // 这里覆盖为 visible：滚动锁改由全屏 fixed 覆盖层自身承担，避免打开预览跳顶。
+    const scrollLockOverride = document.createElement('style');
+    scrollLockOverride.textContent = 'body.viewer-open{overflow:visible!important}';
+    document.head.appendChild(scrollLockOverride);
+
     browser.runtime.onMessage.addListener(async (message: unknown) => {
       const msg = message as { type: string; urls?: string[] };
       if (msg.type === 'PREVIEW_IMG' && msg.urls) {
@@ -101,6 +109,7 @@ export default defineContentScript({
           tooltip: false,
           loop: false,
           zIndex: 10000,
+          focus: false, // 不抢页面焦点（默认 focus 覆盖层，部分站点会因此滚顶）
         });
 
         viewer.show();
